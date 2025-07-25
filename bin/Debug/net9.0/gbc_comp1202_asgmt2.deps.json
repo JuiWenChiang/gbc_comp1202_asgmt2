@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "gbc_comp1202_asgmt2/1.0.0": {
+        "runtime": {
+          "gbc_comp1202_asgmt2.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "gbc_comp1202_asgmt2/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

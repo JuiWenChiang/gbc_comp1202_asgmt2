@@ -1,0 +1,15 @@
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/bin/Debug/net9.0/gbc_comp1202_asgmt2
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/bin/Debug/net9.0/gbc_comp1202_asgmt2.deps.json
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/bin/Debug/net9.0/gbc_comp1202_asgmt2.runtimeconfig.json
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/bin/Debug/net9.0/gbc_comp1202_asgmt2.dll
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/bin/Debug/net9.0/gbc_comp1202_asgmt2.pdb
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/obj/Debug/net9.0/gbc_comp1202_asgmt2.GeneratedMSBuildEditorConfig.editorconfig
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/obj/Debug/net9.0/gbc_comp1202_asgmt2.AssemblyInfoInputs.cache
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/obj/Debug/net9.0/gbc_comp1202_asgmt2.AssemblyInfo.cs
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/obj/Debug/net9.0/gbc_comp1202_asgmt2.csproj.CoreCompileInputs.cache
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/obj/Debug/net9.0/gbc_comp1202_asgmt2.sourcelink.json
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/obj/Debug/net9.0/gbc_comp1202_asgmt2.dll
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/obj/Debug/net9.0/refint/gbc_comp1202_asgmt2.dll
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/obj/Debug/net9.0/gbc_comp1202_asgmt2.pdb
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/obj/Debug/net9.0/gbc_comp1202_asgmt2.genruntimeconfig.cache
+/Users/rea_wen/Desktop/code/exercises/T186/C#/gbc_comp1202_asgmt2/obj/Debug/net9.0/ref/gbc_comp1202_asgmt2.dll
