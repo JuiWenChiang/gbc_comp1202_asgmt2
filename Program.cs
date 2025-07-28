@@ -10,8 +10,9 @@ namespace gbc_comp1202_asgmt2
 using System;
 using System.IO;
 
+/// <summary>
 /// Game class represents a video game item in the shop inventory
-
+/// </summary>
 public class Game
 {
     // Private fields
@@ -49,8 +50,8 @@ public class Game
 
     public void SetItemNumber(string value)
     {
-        // Simple validation - check if it's 4 digits and all are numbers
-        if (value.Length == 4 && IsAllDigits(value))
+        // Simple validation - check if it's 4 digits
+        if (value.Length == 4)
         {
             itemNumber = value;
         }
@@ -58,17 +59,6 @@ public class Game
         {
             Console.WriteLine("Item number must be exactly 4 digits!");
         }
-    }
-    
-    // Helper method to check if string contains only digits
-    private bool IsAllDigits(string str)
-    {
-        for (int i = 0; i < str.Length; i++)
-        {
-            if (str[i] < '0' || str[i] > '9')
-                return false;
-        }
-        return true;
     }
 
     // Getter and Setter for ItemName
