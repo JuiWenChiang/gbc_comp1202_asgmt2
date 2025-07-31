@@ -183,36 +183,56 @@ namespace gbc_comp1202_asgmt2
     /* File & Search Handler Class Developer - Howard */
     public class FileHandler
     {
-        StreamReader? sr = null;
         private const string FILENAME = "VideoGames.txt";
+        Game[]? gamesList;
 
-        public StreamReader? LoadFile()
+        public FileHandler()
         {
             try
             {
+                int lineCount = 0;
+                string? fileLine;
+                int i = 0;
+                // Get array size
+                StreamReader? sr = new StreamReader(FILENAME);
+                while (sr.ReadLine() != null) lineCount++;
+                gamesList = new Game[lineCount];
+                sr.Close();
+                // Build array of game objects
                 sr = new StreamReader(FILENAME);
+                while ((fileLine = sr.ReadLine()) != null) gamesList[i++] = Game.FromFileString(fileLine);
+                sr.Close();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-            return sr;
         }
-
-        public bool AppendFile(Game game)
+        public bool ViewAll()
+        {
+            if (gamesList != null)
+            {
+                foreach (var game in gamesList)
+                {
+                    Console.WriteLine(game.ToString());
+                }
+            }
+            return false;
+        }
+        public bool Append(Game game)
         {
             StreamWriter? sw = null;
             bool isSuccess = false;
             try
             {
-                sw = new StreamWriter("VideoGames.txt", true);
-                // toFileString() returns the game object as a string
+                sw = new StreamWriter(FILENAME, true);
                 sw.WriteLine(game.ToFileString());
                 isSuccess = true;
             }
             finally
             {
                 sw?.Close();
+
             }
             return isSuccess;
         }
@@ -220,102 +240,74 @@ namespace gbc_comp1202_asgmt2
         public bool Lookup(string itemNumber)
         {
             bool isSuccess = false;
-            // File loaded?
-            if ((sr = LoadFile()) != null)
-            {
-                string? fileLine;
-                // Line present?
-                while ((fileLine = sr.ReadLine()) != null)
+            if (gamesList != null)
+                foreach (var game in gamesList)
                 {
-                    // Matching ItemNum?
-                    Game game = Game.FromFileString(fileLine);
                     if (game.GetItemNumber() == itemNumber)
                     {
-                        // Pretty print
                         Console.WriteLine(game.ToString());
-                        isSuccess = true;
-                        break;
+                        return true;
                     }
                 }
-                sr.Close();
-            }
             return isSuccess;
         }
+
         // Overloaded Lookup by max price
         public bool Lookup(decimal maxPrice)
         {
             bool isSuccess = false;
-            Game[] gamesList = [];
             int count = 0;
-            if ((sr = LoadFile()) != null)
+            Game[] filteredGames = [];
+            if (gamesList != null)
             {
-                string? fileLine;
-                while ((fileLine = sr.ReadLine()) != null)
+                foreach (var game in gamesList)
                 {
-                    Game game = Game.FromFileString(fileLine);
                     if (game.GetPrice() <= maxPrice)
                     {
-                        Array.Resize(ref gamesList, ++count);
-                        gamesList[count - 1] = game;
-                        isSuccess = true;
+                        Array.Resize(ref filteredGames, ++count);
+                        filteredGames[count - 1] = game;
                     }
                 }
-                Console.WriteLine("\n{0} listings found under {1:C}:", gamesList.Length, maxPrice);
-                foreach (Game game in gamesList)
+                Console.WriteLine("\n{0} listings found under {1:C}:", filteredGames.Length, maxPrice);
+                foreach (var game in filteredGames)
                 {
                     Console.WriteLine(game.ToString());
                 }
-                sr.Close();
+                return true;
             }
             return isSuccess;
         }
 
         public bool ViewStats()
         {
-            int lineCount = 0;
-            string? fileLine;
-
-            if ((sr = LoadFile()) != null)
+            if (gamesList != null)
             {
-                while (sr.ReadLine() != null) lineCount++;
-                sr.Close();
-            }
-            else return false;
+                int productsTotal = 0;
+                decimal valueTotal = 0m;
+                decimal meanPrice;
+                decimal price;
+                Game cheapestGame = gamesList[0];
+                Game priciestGame = gamesList[0];
 
-            Game[] gamesList = new Game[lineCount];
-
-            if ((sr = LoadFile()) != null)
-            {
-                int i = 0;
-                while ((fileLine = sr.ReadLine()) != null)
+                foreach (var game in gamesList)
                 {
-                    gamesList[i++] = Game.FromFileString(fileLine);
+                    price = game.GetPrice();
+                    productsTotal += game.GetQuantity();
+                    valueTotal += game.GetQuantity() * price;
+
+                    if (price < cheapestGame.GetPrice()) cheapestGame = game;
+                    else if (price >= priciestGame.GetPrice()) priciestGame = game;
                 }
-                sr.Close();
+                meanPrice = valueTotal / productsTotal;
+                Console.WriteLine("\nThe mean price of {0} stocked items valued at {1:C}: {2:C}", productsTotal, valueTotal, meanPrice);
+                Console.WriteLine("\nThe price range of our products is between {0:C} ~ {1:C}", cheapestGame.GetPrice(), priciestGame.GetPrice());
+                Console.WriteLine("\nOur cheapest game is:\n{0}", cheapestGame);
+                Console.WriteLine("\nAnd our most expensive game is:\n{0}", priciestGame);
             }
-            else return false;
-
-            int productsTotal = 0;
-            decimal valueTotal = 0m;
-            decimal meanPrice;
-            Game cheapestGame = gamesList[0];
-            Game priciestGame = gamesList[0];
-            decimal price;
-
-            foreach (var game in gamesList)
+            else
             {
-                price = game.GetPrice();
-                productsTotal += game.GetQuantity();
-                valueTotal += game.GetQuantity() * price;
-
-                if (price < cheapestGame.GetPrice()) cheapestGame = game;
-                else if (price >= priciestGame.GetPrice()) priciestGame = game;
+                Console.WriteLine("No games! Try adding some.");
             }
-            meanPrice = valueTotal / productsTotal;
-            Console.WriteLine("\nThe mean price of {0} stocked items valued at {1:C}: {2:C}", productsTotal, valueTotal, meanPrice);
-            Console.WriteLine("\nThe price range of our products is between {0:C} ~ {1:C}", cheapestGame.GetPrice(), priciestGame.GetPrice());
-            Console.WriteLine("\nOur cheapest game is:\n{0}", cheapestGame);
-            Console.WriteLine("\nAnd most expensive game is:\n{0}", priciestGame);
             return true;
         }
     }
@@ -353,9 +345,13 @@ namespace gbc_comp1202_asgmt2
             {
                 case "1":
                     Console.WriteLine(menuItem[0]);
+                    // Example usage:
+                    // file.ViewAll();
                     break;
                 case "2":
                     Console.WriteLine(menuItem[1]);
+                    // Example usage:
+                    // file.Append(new Game("1234", "Tetris", 10.50m, 5, 1));
                     break;
                 case "3":
                     Console.WriteLine(menuItem[2]);
@@ -377,6 +373,7 @@ namespace gbc_comp1202_asgmt2
                     Console.ReadKey();
                     break;
             }
+
         }
     }
 }
