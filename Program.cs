@@ -7,8 +7,7 @@ using System.Runtime.CompilerServices;
 */
 namespace gbc_comp1202_asgmt2
 {
-    /* Game Class Developer - Anastasiia */
-    // Game class represents a video game item in the shop inventory
+    /* Game Class Developer - Anastasiia :Game class represents a video game item in the shop inventory */
     public class Game
     {
         // Private fields
@@ -183,13 +182,23 @@ namespace gbc_comp1202_asgmt2
     /* File & Search Handler Class Developer - Howard */
     public class FileHandler
     {
-        private const string FILENAME = "VideoGames.txt";
-        Game[]? gamesList;
+        private const string FILENAME = "./bin/Debug/net9.0/VideoGames.txt"; // please note your net version
+
+        // Game[]? gamesList;
+        Game[] gamesList = new Game[0];
 
         public FileHandler()
         {
             try
             {
+                if (!File.Exists(FILENAME))
+                {
+                    // StreamReader does not automatically create a file.
+                    // StreamWriter does automatically create a file if it doesn't exist.
+                    Console.WriteLine("Your game file is ready! Luck 7 is setting one up for you since none was found!\n");
+                    File.Create(FILENAME).Close();
+                }
+
                 int lineCount = 0;
                 string? fileLine;
                 int i = 0;
@@ -212,9 +221,16 @@ namespace gbc_comp1202_asgmt2
         {
             if (gamesList != null)
             {
-                foreach (var game in gamesList)
+                if (gamesList.Length > 0)
                 {
-                    Console.WriteLine(game.ToString());
+                    foreach (var game in gamesList)
+                    {
+                        Console.WriteLine(game.ToString());
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No game data yet. Time to bring in some lucky titles!");
                 }
             }
             return false;
@@ -227,12 +243,24 @@ namespace gbc_comp1202_asgmt2
             {
                 sw = new StreamWriter(FILENAME, true);
                 sw.WriteLine(game.ToFileString());
+                // expand the array and add new data
+                Game[] newDataArray = new Game[gamesList.Length + 1];
+                for (int i = 0; i < gamesList.Length; i++)
+                {
+                    newDataArray[i] = gamesList[i];
+                }
+                newDataArray[newDataArray.Length - 1] = game;
+                gamesList = newDataArray;
+
                 isSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\nERROR: {ex.Message}");
             }
             finally
             {
                 sw?.Close();
-
             }
             return isSuccess;
         }
@@ -249,6 +277,7 @@ namespace gbc_comp1202_asgmt2
                         return true;
                     }
                 }
+            Console.WriteLine("Opps, no matching items found.");
             return isSuccess;
         }
 
@@ -313,67 +342,267 @@ namespace gbc_comp1202_asgmt2
     }
 
     /*  Menu & Main Program Developer - JuiWen */
+    public class ConsoleHelper
+    {
+        public void AskToContinue(ref bool keepRunning, string continueMessage, string exitingMessage, string misinputMessage)
+        {
+            bool keepContinue = true;
+
+            while (keepContinue)
+            {
+                Console.WriteLine($"\n{continueMessage}");
+                Console.Write("> ");
+                string input = Console.ReadLine() ?? "";
+                string result = input.Trim().ToUpper();
+
+                if (result == "Y")
+                {
+                    Console.Clear();
+                    keepContinue = false;
+                }
+                else if (result == "N")
+                {
+                    if (exitingMessage != "") Console.WriteLine(exitingMessage);
+                    keepRunning = false;
+                    keepContinue = false;
+                }
+                else
+                {
+                    Console.WriteLine(misinputMessage);
+                }
+            }
+        }
+    }
+
+
+    public class GameOperations
+    {
+        FileHandler file = new FileHandler();
+        ConsoleHelper conHelper = new ConsoleHelper();
+        string enterNumber = "Please enter the number of the item, must be a 4-digit numeric string (e.g., 1234):";
+        string misinputEnter = "Invalid input. Please enter a valid answer.";
+
+        public string InputItemNumber(bool isStep)
+        {
+            string itemNumber;
+            while (true)
+            {
+                string message = isStep
+                ? $"\nStep1.\n{enterNumber}\n> "
+                : $"\n{enterNumber}\n> ";
+                Console.Write(message);
+
+                itemNumber = Console.ReadLine() ?? "";
+                if (itemNumber.Length == 4 && int.TryParse(itemNumber, out _))
+                    break;
+                Console.WriteLine(misinputEnter);
+            }
+            return itemNumber;
+        }
+
+        public void AddNewItem()
+        {
+            string enterName = "\nStep2.\nPlease enter the name of the item (cannot be empty or blank):";
+            string enterPrice = "\nStep3.\nPlease enter the price of the item in decimal format (e.g., 19.99):";
+            string enterRating = "\nStep4.\nPlease enter the rating of the item (1 to 5):";
+            string enterQuantity = "\nStep5.\nPlease enter the quantity of the item in whole numbers:";
+            string successfullyMessage = "\n** Item added successfully! Here is the complete list of items: **\n";
+            string faildMessage = "\nOops, adding failed. Something went wrong!";
+
+            // Step1.
+            string itemNumber = InputItemNumber(true);
+
+            // Step2. 
+            string itemName;
+            do
+            {
+                Console.Write($"{enterName}\n> ");
+                itemName = Console.ReadLine() ?? "";
+
+                if (itemName == null || itemName.Trim().Length == 0)
+                {
+                    Console.WriteLine(misinputEnter);
+                }
+            } while (itemName == null || itemName.Trim().Length == 0);
+
+            // Step3.
+            decimal itemPrice;
+            Console.Write($"{enterPrice}\n> ");
+            while (!decimal.TryParse(Console.ReadLine(), out itemPrice))
+            {
+                Console.WriteLine(misinputEnter);
+            }
+
+            // Step4.
+            int itemRating;
+            Console.Write($"{enterRating}\n> ");
+            while (!int.TryParse(Console.ReadLine(), out itemRating) || itemRating < 1 || itemRating > 5)
+            {
+                Console.WriteLine(misinputEnter);
+            }
+
+            // Step5.
+            int itemQuantity;
+            Console.Write($"{enterQuantity}\n> ");
+            while (!int.TryParse(Console.ReadLine(), out itemQuantity))
+            {
+                Console.WriteLine(misinputEnter);
+            }
+
+            // Result
+            bool addResult = file.Append(new Game(itemNumber, itemName, itemPrice, itemRating, itemQuantity));
+            if (addResult)
+            {
+                Console.WriteLine(successfullyMessage);
+                file.ViewAll();
+            }
+            else
+            {
+                Console.WriteLine(faildMessage);
+            }
+        }
+        public void SearchItem()
+        {
+            bool Research = true;
+            string[] searchingMenuItem = {
+                "1 Searching based on Item Number.",
+                "2 Searching based on maximum Price.",
+                "3 End of Searching."
+            };
+
+            string searchingBasedAsking = "\nPlease enter a number to select the search method:";
+            string enterDecimal = "\nPlease enter the maximum price for the item (e.g., 19.99)";
+            string reSearchMessage = "\nWould you like to search for another item? (Y/N):";
+
+            while (Research)
+            {
+                string userSearchingBasedOn = "";
+                Console.WriteLine(searchingBasedAsking);
+                foreach (string item in searchingMenuItem)
+                {
+                    Console.WriteLine($"{item}");
+                }
+
+                Console.Write("> ");
+                userSearchingBasedOn = Console.ReadLine() ?? "";
+
+                switch (userSearchingBasedOn)
+                {
+                    case "1":
+                        string itemNumber = InputItemNumber(false);
+                        file.Lookup(itemNumber);
+                        break;
+                    case "2":
+                        bool startOver = true;
+                        while (startOver)
+                        {
+                            Console.WriteLine($"\n{enterDecimal}");
+                            Console.Write("> ");
+                            string userInputDec = Console.ReadLine() ?? "";
+                            if (decimal.TryParse(userInputDec, out decimal result))
+                            {
+                                startOver = false;
+                                file.Lookup(result);
+                            }
+                            else
+                            {
+                                Console.WriteLine(misinputEnter);
+                            }
+                        }
+                        break;
+                    case "3":
+                        Research = false;
+                        break;
+                    default:
+                        Console.WriteLine(misinputEnter);
+                        break;
+                }
+
+                if (userSearchingBasedOn == "1" || userSearchingBasedOn == "2")
+                {
+                    conHelper.AskToContinue(ref Research, reSearchMessage, "", misinputEnter);
+                }
+            }
+        }
+    }
+
+
     class Program
     {
         static void Main(string[] args)
         {
+            Console.Clear();
             Console.WriteLine("\n=== Welcome to Luck 7's video game shop! ===\n");
-            // Theusershouldbeabletoaccessthedifferentoptionsviaamenuthatshouldbe displayed on running the program. The menu should include options which allow the user to display the information saved in the file about the items, to add new items, search for an item, perform statistical analysis and any other options deemed necessary, including an exit option.
+            bool keepRunning = true;
+            string userInput = "";
 
             // menu item
             string[] menuItem = {
-                "1.Display the information",
-                "2.Add new items",
-                "3.Search for an item",
-                "4.Statistical analysis ",
-                "5.Exit"
+                "1 Display the information.",
+                "2 Add new items.",
+                "3 Search for an item.",
+                "4 Statistical analysis.",
+                "5 Exit."
             };
-
-            Console.WriteLine("Please enter a number for the options.");
-            string? userInput;
-
-            for (var item = 0; menuItem.Length > item; item++)
-            {
-                Console.WriteLine($"{menuItem[item]}");
-            }
-
-            userInput = Console.ReadLine();
+            string processAsking = "Please enter a number for the options.";
+            string exitingMessage = "Exiting program....\nThank you for visiting Luck 7's Game Shop!\nGoodbye and may the 7s always be in your favor! :)\n";
+            string continueMessage = "Shall we return to the menu? (Y/N):";
+            string misinputMessage = "Opps, invalid choice. Press any key to try again.";
+            string endMessage = "\n* The process is complete! *";
 
             FileHandler file = new FileHandler();
+            var gameOps = new GameOperations();
+            var conHelper = new ConsoleHelper();
 
-            switch (userInput)
+            while (keepRunning)
             {
-                case "1":
-                    Console.WriteLine(menuItem[0]);
-                    // Example usage:
-                    // file.ViewAll();
-                    break;
-                case "2":
-                    Console.WriteLine(menuItem[1]);
-                    // Example usage:
-                    // file.Append(new Game("1234", "Tetris", 10.50m, 5, 1));
-                    break;
-                case "3":
-                    Console.WriteLine(menuItem[2]);
-                    // Example usage:
-                    // file.Lookup("0299"); // Item num
-                    // file.Lookup(59.99m); // Max Price
-                    break;
-                case "4":
-                    Console.WriteLine(menuItem[3]);
-                    // Example usage:
-                    // file.ViewStats();
-                    break;
-                case "5":
-                    Console.WriteLine(menuItem[4]);
-                    Console.WriteLine("Exiting program.Have a nice day and see you again! :) ");
-                    break;
-                default:
-                    Console.WriteLine("Invalid choice. Press any key to try again.");
-                    Console.ReadKey();
-                    break;
-            }
+                Console.WriteLine(processAsking);
+                foreach (string item in menuItem)
+                {
+                    Console.WriteLine($"{item}");
+                }
 
+                Console.Write("> ");
+                userInput = Console.ReadLine() ?? "";
+                Console.Clear();
+                switch (userInput)
+                {
+                    case "1":
+                        Console.WriteLine($"\n----- {menuItem[0]} -----\n");
+                        file.ViewAll();
+                        Console.WriteLine(endMessage);
+                        break;
+                    case "2":
+                        Console.WriteLine($"\n----- {menuItem[1]} -----");
+                        gameOps.AddNewItem();
+                        Console.WriteLine(endMessage);
+                        break;
+                    case "3":
+                        Console.WriteLine($"\n----- {menuItem[2]} -----");
+                        gameOps.SearchItem();
+                        Console.WriteLine(endMessage);
+                        break;
+                    case "4":
+                        Console.WriteLine(menuItem[3]);
+                        file.ViewStats();
+                        Console.WriteLine(endMessage);
+                        break;
+                    case "5":
+                        Console.WriteLine(menuItem[4]);
+                        Console.WriteLine(exitingMessage);
+                        keepRunning = false;
+                        break;
+                    default:
+                        Console.WriteLine(misinputMessage);
+                        Console.ReadKey();
+                        break;
+                }
+
+                if (keepRunning && userInput != "5")
+                {
+                    conHelper.AskToContinue(ref keepRunning, continueMessage, exitingMessage, misinputMessage);
+                }
+            }
         }
     }
 }
